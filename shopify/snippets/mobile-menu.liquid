@@ -1,0 +1,57 @@
+{% assign link_styles = 'txt-link text-current hover:text-orange-500 focus:text-orange-500 active:text-orange-800' %}
+
+<div 
+  x-show="open"
+  x-cloak  
+  x-transition:enter="transition ease-out duration-1000"
+  x-transition:enter-start="left-[-100vw]"
+  x-transition:enter-end="left-0"
+  x-transition:leave="transition ease-in duration-1000"
+  x-transition:leave-start="left-0"
+  x-transition:leave-end="left-[-100vw]"
+  class="md:hidden fixed top-0 bg-white px-4 w-full h-screen z-30"
+>
+  <div class="flex items-center justify-between h-16 border-b border-black">
+    <div>
+      {% if section.settings.logo != blank %}
+        <a href="/">
+          {{ section.settings.logo | image_url: width: 400 | image_tag: loading: 'lazy' }}
+        </a>
+      {% else %}
+        <a href="/" class="text-3xl font-medium">
+          {{ shop.name }}
+        </a>
+      {% endif %}
+    </div>
+    <button @click="open = !open" class="h-10 w-10 rounded-md bg-transparent hover:bg-black hover:bg-opacity-10 cursor-pointer">
+      {% render 'icon-close-small' %}
+    </button>
+  </div>
+
+  <div>
+    <ul>
+      {% for link in section.settings.menu.links %}
+        {% if link.links != blank %}
+          <li class="py-2 block relative">
+            <a href="{{ link.url }}" class="{{ link_styles }}">{{ link.title }}</a>
+            
+            <ul class="absolute bg-white border py-3 px-4 top-16 left-1/2 transform -translate-x-1/2">
+              {% for sublink in linklists[link.handle].links %}
+                <li>
+                  <a class="block py-1 hover:opacity-75 {{ link_styles }}" href="{{ sublink.url }}">
+                    {{ sublink.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% else %}
+          <li>
+            <a class="py-2 block {{ link_styles }}" href="{{ link.url }}">
+              {{ link.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul> 
+  </div>
+</div>

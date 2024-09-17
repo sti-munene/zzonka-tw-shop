@@ -1,0 +1,202 @@
+<div x-data="{ open: false }" x-cloak>
+  <header class="bg-black fixed top-0 left-0 z-30 w-full">
+  <div class="mx-auto max-w-7xl px-4 lg:px-6">
+    <div class="header w-full h-16">
+      <div class="header-logo">
+        {% if section.settings.logo != blank %}
+          <a href="/">
+            {{ section.settings.logo | image_url: width: 400 | image_tag: loading: 'lazy' }}
+          </a>
+        {% else %}
+          <a href="/" class="text-3xl font-medium">
+            {{ shop.name }}
+          </a>
+        {% endif %}
+      </div>
+
+
+      <nav class="header-nav">
+         <button
+         @click="open = !open"
+         class="md:hidden flex items-center justify-center bg-transparent hover:bg-white hover:bg-opacity-10 rounded-md" 
+         type="button">
+          {% render 'icon-menu' class='w-10 h-10' %}
+        </button>
+  
+        <ul class="hidden md:flex space-x-4 md:items-center">
+          {% for link in section.settings.menu.links %}
+            {% if link.links != blank %}
+              <li class="py-5 px-4 block relative">
+                <a href="{{ link.url }}">{{ link.title }}</a>
+                
+                <ul class="absolute bg-white border py-3 px-4 top-16 left-1/2 transform -translate-x-1/2">
+                  {% for sublink in linklists[link.handle].links %}
+                    <li>
+                      <a class="block py-1 hover:opacity-75 " href="{{ sublink.url }}">
+                        {{ sublink.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% else %}
+              <li>
+                <a class="py-5 px-4 block" href="{{ link.url }}">
+                  {{ link.title }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul> 
+      </nav>
+  
+   <div class="header-account">
+    <div class="flex items-center justify-end">
+      {%- if shop.customer_accounts_enabled -%}
+        <div class="relative z-10">
+          <a
+            href="{{ routes.account_url }}"
+            title="account link"
+            class="block text-center">
+            {% render 'icon-account', class: 'w-10 mx-auto' %}
+            <span class="sr-only">
+              {%- liquid
+                  if customer
+                    echo 'customer.account_fallback' | t
+                  else
+                    echo 'customer.account_fallback' | t
+                  endif
+                -%}
+            </span>
+          </a>
+        </div>
+      {%- endif -%}
+
+      <button
+        type="button"
+        title="Cart button"
+        class="text-center text-white relative bg-transparent">
+        {% render 'icon-cart', class: 'w-10' %}
+        <span class="sr-only">{{ 'templates.cart.cart' | t }}</span>
+        <span x-text="cart_count" class="min-w-[22px] text-sm min-h-[22px] absolute grid place-content-center rounded-full -top-3 -right-1 text-white bg-black">
+          {{ cart.item_count }}
+        </span>
+      </button>
+    </div> 
+   </div>
+    </div>
+  </div>
+  </header>
+  {% render 'mobile-menu' section: section %}
+  </div>
+<script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+                  "@type": "Organization",
+                  "name": {{ shop.name | json }},
+  {% if section.settings.logo %}
+    {% assign image_size = section.settings.logo.width %}
+    "logo": {{ section.settings.logo | image_url: width: image_size | prepend: "https:" | json }},
+  {% endif %}
+  "sameAs": [
+  {{ settings.social_twitter_link | json }},
+  {{ settings.social_facebook_link | json }},
+  {{ settings.social_pinterest_link | json }},
+  {{ settings.social_instagram_link | json }},
+  {{ settings.social_tiktok_link | json }},
+  {{ settings.social_tumblr_link | json }},
+  {{ settings.social_snapchat_link | json }},
+  {{ settings.social_youtube_link | json }},
+  {{ settings.social_vimeo_link | json }}
+  ],
+  "url": {{ shop.url | append: page.url | json }}
+  }
+</script>
+
+{%- if request.page_type == 'index' -%}
+  {% assign potential_action_target = shop.url | append: routes.search_url | append: "?q={search_term_string}" %}
+  <script type="application/ld+json">
+    {
+    "@context": "http://schema.org",
+                                  "@type": "WebSite",
+                                  "name": {{ shop.name | json }},
+    "potentialAction": {
+                                    "@type": "SearchAction",
+                                    "target": {{ potential_action_target | json }},
+    "query-input": "required name=search_term_string"
+                                  },
+                                  "url": {{ shop.url | append: page.url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "t:sections.header.name",
+    "class": "section-header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "t:sections.header.settings.logo.label"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 50,
+        "max": 250,
+        "step": 10,
+        "default": 100,
+        "unit": "t:sections.header.settings.logo_width.unit",
+        "label": "t:sections.header.settings.logo_width.label"
+      },
+      {
+        "type": "select",
+        "id": "logo_position",
+        "options": [
+          {
+            "value": "middle-left",
+            "label": "t:sections.header.settings.logo_position.options__1.label"
+          }, {
+            "value": "top-left",
+            "label": "t:sections.header.settings.logo_position.options__2.label"
+          }, {
+            "value": "top-center",
+            "label": "t:sections.header.settings.logo_position.options__3.label"
+          }
+        ],
+        "default": "middle-left",
+        "label": "t:sections.header.settings.logo_position.label",
+        "info": "t:sections.header.settings.logo_position.info"
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "default": "main-menu",
+        "label": "t:sections.header.settings.menu.label"
+      }, {
+        "type": "checkbox",
+        "id": "show_line_separator",
+        "default": true,
+        "label": "t:sections.header.settings.show_line_separator.label"
+      }, {
+        "type": "checkbox",
+        "id": "enable_sticky_header",
+        "default": true,
+        "label": "t:sections.header.settings.enable_sticky_header.label",
+        "info": "t:sections.header.settings.enable_sticky_header.info"
+      }, {
+        "type": "header",
+        "content": "t:sections.all.spacing"
+      }, {
+        "type": "range",
+        "id": "margin_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "t:sections.header.settings.margin_bottom.label",
+        "default": 0
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-gray-50;
+  @apply font-sans;
+}
+
+a {
+  text-decoration: none;
+  color: currentColor;
+}
+
+li {
+  list-style-type: none;
+}
+
+.header {
+  @apply grid;
+  @apply items-center;
+  @apply text-white;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-areas: 'nav logo account';
+}
+
+@media (min-width: 768px) {
+  .header {
+    grid-template-areas: 'logo nav account';
+  }
+}
+
+button {
+  outline: transparent;
+  border: transparent;
+}
+
+.header-logo {
+  grid-area: logo;
+  justify-self: center;
+}
+
+.header-nav {
+  grid-area: nav;
+  justify-self: start;
+}
+
+@media (min-width: 768px) {
+  .header-logo {
+    justify-self: start;
+  }
+
+  .header-nav {
+    justify-self: center;
+  }
+}
+
+.header-account {
+  grid-area: account;
+}
+
+.txt-link:hover,
+.txt-link:active,
+.txt-link:focus {
+  text-decoration: underline;
+}
+
+[x-cloak] {
+  display: none;
+}
+
+.card_image > img {
+  height: auto;
+  width: 100%;
+}
